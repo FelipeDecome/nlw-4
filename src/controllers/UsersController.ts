@@ -1,21 +1,22 @@
 import { Request, Response } from "express";
-import { UsersRepository } from "../repositories/UsersRepository";
+import { container } from 'tsyringe';
+
 import { CreateUserService } from "../services/CreateUserService";
 
-export default class UsersController {
+class UsersController {
 
   async create(request: Request, response: Response): Promise<Response> {
     const { name, email } = request.body;
 
-    const usersRepository = new UsersRepository();
-
-    const createUserService = new CreateUserService(usersRepository);
+    const createUserService = container.resolve(CreateUserService);
 
     const user = await createUserService.execute({
       name,
       email,
     })
 
-    return response.json(user);
+    return response.status(201).json(user);
   }
 }
+
+export { UsersController }

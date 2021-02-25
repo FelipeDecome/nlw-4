@@ -37,5 +37,4 @@ export default class CreateSurveys1614114599711 implements MigrationInterface {
     public async down(queryRunner: QueryRunner): Promise<void> {
       await queryRunner.dropTable('surveys');
     }
-
 }
