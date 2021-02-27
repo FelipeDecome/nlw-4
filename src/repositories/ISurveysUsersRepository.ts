@@ -3,8 +3,10 @@ import { SurveyUser } from "../entities/SurveyUser";
 
 interface ISurveysUsersRepository {
   create(data: ICreateSurveysUsersDTO): Promise<SurveyUser>;
-  findByUserId(user_id: string): Promise<SurveyUser | undefined>;
+  findById(id: string): Promise<SurveyUser | undefined>;
+  findByUserSurveyId(userId:string, surveyId: string): Promise<SurveyUser | undefined>;
+  findAllBySurveyId(survey_id: string): Promise<SurveyUser[]>;
   save(survey: SurveyUser): Promise<SurveyUser>;
 }
 
-export { ISurveysUsersRepository };
+export { ISurveysUsersRepository};

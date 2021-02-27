@@ -8,12 +8,12 @@ class SurveyMailController {
 
     const sendSurveyMailService = container.resolve(SendSurveyMailService);
 
-    await sendSurveyMailService.execute({
+    const surveyUser = await sendSurveyMailService.execute({
       email,
       survey_id,
     });
 
-    return response.send();
+    return response.status(201).json(surveyUser);
   }
 }
 

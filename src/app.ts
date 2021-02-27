@@ -1,6 +1,10 @@
+import 'reflect-metadata';
+import 'dotenv/config';
+
 import express, { NextFunction, Request, Response } from 'express';
 import 'express-async-errors';
-import 'reflect-metadata';
+import { errors as celebrateErrors } from 'celebrate';
+
 import { AppError } from './Errors/AppError';
 import { defaultRouter } from './routes';
 import createConnection from './database';
@@ -14,7 +18,7 @@ app.use(express.json());
 
 app.use(defaultRouter)
 
-app.get('/', (req, res) => res.json({message: 'ok'}));
+app.use(celebrateErrors());
 
 app.use((err: Error, request: Request, response: Response, _: NextFunction) => {
   if(err instanceof AppError)

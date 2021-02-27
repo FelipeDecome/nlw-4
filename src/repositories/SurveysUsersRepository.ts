@@ -1,4 +1,4 @@
-import { getRepository, Repository } from "typeorm";
+import { getRepository, LessThanOrEqual, MoreThanOrEqual, Repository } from "typeorm";
 import { ICreateSurveysUsersDTO } from "../dtos/ICreateSurveysUsersDTO";
 
 import { SurveyUser } from "../entities/SurveyUser";
@@ -20,12 +20,39 @@ class SurveysUsersRepository implements ISurveysUsersRepository {
     return this.ormRepository.save(surveyUser);
   }
 
-  public async findByUserId(user_id: string): Promise<SurveyUser | undefined> {
+  public async findById(id: string): Promise<SurveyUser | undefined> {
     return this.ormRepository.findOne({
       where: {
-        user_id,
-      }
+        id,
+      },
+      relations: [
+        'user',
+        'survey',
+      ]
     });
+  }
+
+  public async findByUserSurveyId(userId: string, surveyId: string): Promise<SurveyUser | undefined> {
+    return this.ormRepository.findOne({
+      where: {
+        user_id: userId,
+        survey_id: surveyId,
+      },
+      relations: [
+        'user',
+        'survey',
+      ]
+    });
+  }
+
+  public async findAllBySurveyId(survey_id: string): Promise<SurveyUser[]> {
+    return this.ormRepository.find(
+      {
+        where: {
+          survey_id,
+        }
+      }
+    );
   }
 
   public async save(surveyUser: SurveyUser): Promise<SurveyUser> {

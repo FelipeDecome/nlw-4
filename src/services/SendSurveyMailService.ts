@@ -1,5 +1,6 @@
 import path from 'path';
 import { inject, injectable } from 'tsyringe';
+import { SurveyUser } from '../entities/SurveyUser';
 
 import { AppError } from "../Errors/AppError";
 import { IMailProvider } from "../providers/MailProvider/models/IMailProvider";
@@ -29,7 +30,7 @@ class SendSurveyMailService {
     private mailProvider: IMailProvider,
     ) {}
 
-  public async execute({email, survey_id}: IRequest): Promise<void> {
+  public async execute({email, survey_id}: IRequest): Promise<SurveyUser> {
     const user = await this.usersRepository.findByEmail(email);
 
     if(!user) throw new AppError('User not found.');
@@ -38,10 +39,16 @@ class SendSurveyMailService {
 
     if(!survey) throw new AppError('Survey not found.');
 
-    await this.surveysusersRepository.create({
-      user_id: user.id,
-      survey_id,
-    });
+    let surveyUser = await this.surveysusersRepository.findByUserSurveyId(user.id, survey.id);
+
+    if(!surveyUser) {
+      surveyUser = await this.surveysusersRepository.create({
+        user_id: user.id,
+        survey_id,
+      });
+    }
+
+    if (surveyUser.value) throw new AppError('The user already answered this survey.');
 
     await this.mailProvider.send({
       to: {
@@ -55,11 +62,14 @@ class SendSurveyMailService {
           name: user.name,
           title: survey.title,
           description: survey.description,
+          id: surveyUser.id,
+          link: `${process.env.API_URL}/answers`,
         }
       },
-    })
-  }
+    });
 
+    return surveyUser;
+  }
 }
 
 export { SendSurveyMailService };

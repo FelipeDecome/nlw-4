@@ -30,7 +30,22 @@ describe("Users", () => {
     expect(response.status).toEqual(400);
   });
 
+  it('should fail if email or name is not provided', async () => {
+    const response = await request(app).post('/users').send({
+      name: 'John Doe',
+    });
+
+    expect(response.status).toEqual(400);
+
+    const response2 = await request(app).post('/users').send({
+      email: 'johndoe@example.com',
+    });
+
+    expect(response2.status).toEqual(400);
+  });
+
   afterAll(async () => {
-    connection.migrations.forEach(async () => connection.undoLastMigration());
+    await connection.dropDatabase();
+    await connection.close();
   })
 });
